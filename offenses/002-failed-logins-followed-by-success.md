@@ -90,8 +90,8 @@ That transition is often the difference between:
 
 ---
 
-### Optional Screenshot 3 — Additional Overview Variant
-![Offense 002 Overview Variant](../screenshots/offense-002-overview (2).png)
+### Screenshot 3 — Additional Overview Variant
+![Offense 002 Overview](../screenshots/offense-002-overview (2).png)
 
 **What this screenshot helps show:**  
 This additional screenshot can be used as supporting evidence for the offense timeline or event grouping.
