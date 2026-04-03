@@ -1,59 +1,202 @@
 # Offense 001 — Brute Force and Password Spraying
 
 ## 1. Executive Summary
-This case reviews repeated authentication failures to determine whether the activity is more consistent with normal user mistakes or deliberate credential abuse. The concentration of attempts, repeated account targeting, and systematic feel of the pattern make this a meaningful security event rather than background noise.
+This offense reviews repeated authentication failures to determine whether the activity is more consistent with normal user error or deliberate credential abuse.
+
+The observed pattern is significant because it appears **systematic rather than accidental**. Instead of a single user repeatedly failing one login, the offense suggests a broader authentication pressure pattern that may indicate either:
+
+- **brute-force attempts** against a smaller number of accounts, or
+- **password spraying** across a wider user set.
+
+This type of activity is important in a SOC because it often represents the **early stage of account compromise attempts**.
+
+---
 
 ## 2. Detection Trigger
-- **Observed Theme:** Repeated authentication failures across one or more usernames
-- **Likely Rule / Logic:** High volume or clustered failed authentication events grouped into a single offense
-- **Primary Risk:** Credential guessing, password spraying, brute force, account pressure
+- **Observed Theme:** Repeated authentication failures
+- **Likely QRadar Logic:** Authentication failures grouped into a single offense based on repetition and event concentration
+- **Primary Risk:** Credential guessing / unauthorized account access attempts
 - **Suggested Severity:** Medium to High
 - **Analyst Confidence:** High
 
+---
+
 ## 3. Why This Offense Matters
-Repeated failed authentication is one of the most common noisy signals in enterprise logging, but it becomes important when the pattern shows coordination. Multiple usernames from one source, or repeated attempts against the same identity across a short window, indicate attacker intent more than user frustration.
+Authentication failures happen frequently in real environments and are often noisy.
+
+However, they become much more important when they show patterns such as:
+
+- repeated attempts from the same source,
+- multiple targeted usernames,
+- broad user coverage,
+- or repeated access attempts across the same systems.
+
+That transition — from **random failure** to **behavioral pattern** — is what makes this offense relevant.
+
+This is exactly the kind of case where a SOC analyst must decide:
+
+> “Is this just noise, or is this an attacker trying to get in?”
+
+---
 
 ## 4. Initial Analyst Hypothesis
-The activity likely represents either password spraying (many usernames, fewer attempts per account) or brute-force behavior (more attempts against fewer accounts) rather than accidental mistyping.
+The activity is more likely to represent **credential abuse behavior** than normal login mistakes.
+
+At the start of the investigation, the main hypothesis is:
+
+> A source or group of sources is attempting repeated logins against one or more accounts in a way that resembles brute force or password spraying.
+
+The investigation goal is to determine:
+- whether the activity is concentrated or broad,
+- whether usernames are valid or guessed,
+- and whether the pattern escalates into successful access.
+
+---
 
 ## 5. Evidence Reviewed
-### Supporting screenshots
-- `../screenshots/offense-001-overview.png`
-- `../screenshots/offense-001-username-targeting.png`
-- `../screenshots/offense-001-source-ip-patterns.png`
 
-### Key evidence points
-- Repeated authentication failures are visible across a concentrated set of events.
-- Multiple usernames appear to be involved rather than a single user retrying once or twice.
-- The source pattern appears systematic enough to justify deeper investigation.
+### Screenshot 1 — Offense Overview
+![Offense 001 Overview](../screenshots/offense-001-overview.png)
 
-## 6. Investigation Steps
+**What this screenshot helps show:**  
+This provides the initial QRadar offense context and confirms that the event grouping is centered around suspicious authentication activity.
+
+**Why it matters:**  
+This is the starting point for determining whether the offense is simply noisy or worthy of escalation.
+
+---
+
+### Screenshot 2 — Username Targeting Pattern
+![Offense 001 Username Targeting](../screenshots/offense-001-username-targeting.png)
+
+**What this screenshot helps show:**  
+This view is useful for identifying whether multiple usernames are being targeted.
+
+**Why it matters:**  
+If many usernames are involved, the behavior becomes more consistent with **password spraying** rather than a single user mistyping a password.
+
+---
+
+### Screenshot 3 — Source IP Pattern
+![Offense 001 Source IP Patterns](../screenshots/offense-001-source-ip-patterns.png)
+
+**What this screenshot helps show:**  
+This screenshot helps validate whether repeated failures are coming from a concentrated source or source group.
+
+**Why it matters:**  
+Source concentration is one of the strongest indicators that the activity may be attacker-driven rather than accidental.
+
+---
+
+## 6. Key Evidence Points
+The most meaningful indicators in this offense are:
+
+- repeated authentication failures,
+- visible concentration of source behavior,
+- signs of username targeting,
+- and an overall pattern that appears systematic rather than random.
+
+### Why that matters
+A single failed login is usually not meaningful.
+
+A repeated and structured failure pattern is different because it may indicate:
+- password guessing,
+- account discovery,
+- or a deliberate attempt to gain access without valid credentials.
+
+---
+
+## 7. Investigation Steps
+The recommended analyst workflow for this offense is:
+
 1. Review the offense summary and grouped events.
-2. Identify the most repeated source, user, destination, or event pattern.
-3. Pivot into supporting event context and compare repetition vs spread.
-4. Check whether the pattern is isolated, broad, privileged, or followed by success.
-5. Assess whether the behavior is more consistent with noise or malicious intent.
+2. Identify the most repeated source IP or host involved.
+3. Pivot into usernames associated with the repeated failures.
+4. Determine whether the same source targeted one account or many.
+5. Check whether any of the targeted accounts later authenticated successfully.
+6. Compare the source behavior against expected internal systems, scanners, or admin tooling.
+7. Assess whether the behavior is isolated noise or part of a broader attack chain.
 
-## 7. Analyst Interpretation
-The visible pattern aligns more strongly with **credential abuse** than with routine user error. The most important signal is not just failure volume, but the structure of the behavior: repeated attempts, identity spread, and a systematic pattern. That combination is commonly associated with brute-force or password-spraying activity.
+---
 
-## 8. False Positive Considerations
-- A user repeatedly entering the wrong password could produce failures, but would usually be limited to one username.
-- A broken script or service account can also create repeated failures, but usually shows a more consistent single-account pattern.
-- Internal vulnerability or authentication testing can mimic this behavior and should be ruled out with asset and source validation.
+## 8. Analyst Interpretation
+The offense pattern is more consistent with **credential abuse behavior** than with ordinary user error.
 
-## 9. MITRE ATT&CK Mapping
-- **Primary Tactic:** Credential Access
-- **Primary Technique:** T1110 — Brute Force
-- **Why this fits:** The offense reflects repeated attempts to gain access by testing credentials rather than using a known valid account from the start.
+### Why
+The evidence suggests:
 
-## 10. Recommended Validation / Next Steps
-- Pivot on the top source IP to identify all targeted usernames.
-- Check whether any of the targeted users later authenticated successfully.
-- Validate whether privileged or service accounts were involved.
-- Compare source behavior across other assets and time windows.
+- repeated activity,
+- structure rather than randomness,
+- and possible identity spread.
 
-## 11. Final Analyst Verdict
-**Assessment:** Suspicious activity consistent with credential guessing and worthy of escalation or deeper validation.
+That combination strongly aligns with:
 
-**SOC Action:** Investigate the source, review targeted accounts, and increase urgency if a success event or privileged account is involved.
+- **brute force** if the source is repeatedly targeting a smaller set of users, or
+- **password spraying** if the source is touching a broader set of usernames with fewer attempts per account.
+
+### Security meaning
+This offense likely represents an attacker or automated process attempting to validate or guess credentials.
+
+That makes it an important early-stage offense, even if there is no confirmed successful access yet.
+
+---
+
+## 9. False Positive Considerations
+Before escalating this offense as malicious, a good analyst should consider benign explanations such as:
+
+- a user repeatedly typing the wrong password,
+- a stale password stored in a service or script,
+- an internal authentication testing tool,
+- or noisy login retries from administrative systems.
+
+### Why those are less convincing here
+Those explanations usually produce:
+- one username,
+- one service account,
+- or a more predictable internal pattern.
+
+When the offense shows:
+- repeated source concentration,
+- multiple usernames,
+- or broader account coverage,
+
+the behavior becomes less likely to be accidental.
+
+---
+
+## 10. MITRE ATT&CK Mapping
+- **Tactic:** Credential Access
+- **Technique:** **T1110 — Brute Force**
+
+### Why this fits
+This technique is appropriate because the offense reflects repeated attempts to gain access using guessed or tested credentials rather than already-validated account access.
+
+Depending on the exact pattern, this may also overlap with:
+- password spraying behavior,
+- account discovery,
+- or broader identity-focused reconnaissance.
+
+---
+
+## 11. Recommended Validation / Next Steps
+To strengthen or disprove the suspicion, the SOC should:
+
+- pivot on the top source IP,
+- identify all usernames associated with that source,
+- check whether any targeted account later logged in successfully,
+- validate whether the accounts are valid internal users,
+- determine whether privileged accounts were included,
+- and compare the activity to expected internal authentication behavior.
+
+### Escalate faster if:
+- the source is external,
+- a privileged account is involved,
+- or a successful login follows the failures.
+
+---
+
+## 12. Final Analyst Verdict
+**Assessment:** Suspicious activity consistent with credential guessing / authentication abuse.
+
+**SOC Action:**  
+Continue investigation, validate the source and targeted identities, and escalate if successful access or privileged targeting is confirmed.
