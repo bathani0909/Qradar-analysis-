@@ -88,16 +88,6 @@ That transition is often the difference between:
 - low-priority login noise,
 - and a real incident requiring escalation.
 
----
-
-### Screenshot 3 — Additional Overview Variant
-![Offense 002 Overview](../screenshots/offense-002-overview (2).png)
-
-**What this screenshot helps show:**  
-This additional screenshot can be used as supporting evidence for the offense timeline or event grouping.
-
-**Why it matters:**  
-Multiple offense views can help reinforce that the behavior was not isolated and should be interpreted as a sequence rather than a single event.
 
 ---
 
