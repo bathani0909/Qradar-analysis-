@@ -91,7 +91,7 @@ That transition is often the difference between:
 ---
 
 ### Screenshot 3 — Additional Overview Variant
-![Offense 002 Overview](../offense-002-overview (2).png)
+![Offense 002 Overview](../screenshots/offense-002-overview (2).png)
 
 **What this screenshot helps show:**  
 This additional screenshot can be used as supporting evidence for the offense timeline or event grouping.
